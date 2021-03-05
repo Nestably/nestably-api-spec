@@ -1,0 +1,848 @@
+openapi: 3.0.3
+info:
+  title: Nestably API
+  description: API description for Nestably
+  version: 0.0.0
+servers:
+  - url: 'https://dev'
+    description: dev
+  - url: 'https://prod'
+    description: prod
+  - url: 'https://qa'
+    description: qa
+paths:
+  /user:
+    put:
+      summary: Update user attributes in both db and cognito
+      description: Update the current user (identified via cognito signature)
+      operationId: updateUserProfile
+      tags:
+        - users
+      requestBody:
+        required: true
+        description: Contains the details to update the user with
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyUser'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    exclusiveMinimum: false
+        '400':
+          description: failed operation
+          content:
+            application/json:
+              schema:
+                type: object
+  /pro:
+    get:
+      summary: Get pro profile for the signed in user
+      description: Get the current user's (identified via cognito signature) pro profile. Used for editing pro profile
+      operationId: getMyProProfile
+      tags:
+        - pros
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyPro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    post:
+      summary: Create pro profile for the signed in user
+      description: Create the current user's (identified via cognito signature) pro profile
+      operationId: createMyProProfile
+      tags:
+        - pros
+      requestBody:
+        required: true
+        description: Contains the details to create a new pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyPro'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    exclusiveMinimum: false
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update pro profile for the signed in user
+      description: Update the current user's (identified via cognito signature) pro profile
+      operationId: updateMyProProfile
+      tags:
+        - pros
+      requestBody:
+        required: true
+        description: Contains the details to update the pro with
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyPro'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    exclusiveMinimum: false
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  '/pro/{pro_slug}':
+    get:
+      summary: Get pro profile for the desired user
+      description: Get the desired pro profile via pro slug
+      operationId: getThisProProfile
+      tags:
+        - pros
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProProfile'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  '/pros/{q}':
+    get:
+      summary: Get all pros that serve a given location
+      description: Get all pros that serve a given location
+      operationId: getProsByLocation
+      tags:
+        - pros
+      parameters:
+        - $ref: '#/components/parameters/Location'
+        - $ref: '#/components/parameters/SortBy'
+        - $ref: '#/components/parameters/CompanyName'
+        - $ref: '#/components/parameters/Trades'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProProfile'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /trades:
+    get:
+      summary: Get array of all professional trades
+      description: Get array of all professional trades
+      operationId: getTrades
+      tags:
+        - trades
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trades'
+              example:
+                - id: 1
+                  name: carpentry
+                  selected: false
+                - id: 2
+                  name: electrical
+                  selected: false
+                - id: 3
+                  name: plumbing
+                  selected: false
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /pro-trades:
+    get:
+      summary: Get trades for the current user
+      description: Get trades for the current user
+      operationId: getMyProTrades
+      tags:
+        - trades
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trades'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update trades for the current user
+      description: Update trades for the current user
+      operationId: updateMyProTrades
+      tags:
+        - trades
+      requestBody:
+        required: true
+        description: Contains the details to update associated trades with each pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trades'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trades'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /languages:
+    get:
+      summary: Get array of all languages spoken by pros
+      description: Get array of all languages spoken by pros
+      operationId: getLanguages
+      tags:
+        - languages
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  /pro-languages:
+    get:
+      summary: Get languages for the current user
+      description: Get languages for the current user
+      operationId: getMyProLanguages
+      tags:
+        - languages
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update languages for the current user
+      description: Update languages for the current user
+      operationId: updateMyProLanguages
+      tags:
+        - languages
+      requestBody:
+        required: true
+        description: Contains the details to update associated languages with each pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Languages'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Languages'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  '/like/{pro_slug}':
+    get:
+      summary: Get if signed in user liked given pro
+      description: Get if signed in user liked given pro
+      operationId: getMyLikeForThisPro
+      tags:
+        - likes
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikePro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Update if signed in user liked given pro
+      description: Update if signed in user liked given pro
+      operationId: updateMyLikeForThisPro
+      tags:
+        - likes
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      requestBody:
+        required: true
+        description: Contains the details to update the like between signed in user to desired pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LikePro'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LikePro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  '/user-review/{pro_slug}':
+    get:
+      summary: Get review the signed in user submitted about given pro
+      description: Get review the signed in user submitted about given pro
+      operationId: getMyReviewForThisPro
+      tags:
+        - reviews
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    post:
+      summary: Create review the signed in user submitted about given pro
+      description: Create review the signed in user submitted about given pro
+      operationId: createMyReviewForThisPro
+      tags:
+        - reviews
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      requestBody:
+        required: true
+        description: Contains the details to create the Review between signed in user to desired pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewPro'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    put:
+      summary: Create review the signed in user submitted about given pro
+      description: Create review the signed in user submitted about given pro
+      operationId: createMyReviewForThisPro
+      tags:
+        - reviews
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      requestBody:
+        required: true
+        description: Contains the details to create the Review between signed in user to desired pro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewPro'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+    delete:
+      summary: Delete review the signed in user submitted about given pro
+      description: Delete review the signed in user submitted about given pro
+      operationId: deleteMyReviewForThisPro
+      tags:
+        - reviews
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pro_slug:
+                    type: string
+                  deleted:
+                    type: boolean
+                    default: true
+        '404':
+          $ref: '#/components/responses/404NotFound'
+  '/pro-reviews/{pro_slug}':
+    get:
+      summary: Get reviews submitted about given pro
+      description: Get reviews submitted about given pro
+      operationId: getProReviews
+      tags:
+        - reviews
+      parameters:
+        - $ref: '#/components/parameters/ProSlug'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewPro'
+        '404':
+          $ref: '#/components/responses/404NotFound'
+components:
+  parameters:
+    Location:
+      name: q
+      description: A string to use to search for a GoogleMaps location
+      in: path
+      required: true
+      schema:
+        type: string
+      example: '60615'
+    ProSlug:
+      name: pro_slug
+      description: the unique url slug used to identify the pro profile and found on the pro table
+      in: path
+      required: true
+      schema:
+        type: string
+      example: senco-construction
+    SortBy:
+      name: sortBy
+      description: options to sort a list of returned values
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - valueRating
+          - timeRating
+          - qualityRating
+          - priceLowToHigh
+          - priceHighToLow
+    CompanyName:
+      name: companyName
+      description: Option to filter for companies that contain this string
+      in: query
+      required: false
+      schema:
+        type: string
+    Trades:
+      name: trades
+      description: Search for pros that can do all included trades
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+              minimum: 1
+            name:
+              type: string
+            seleced:
+              type: boolean
+  schemas:
+    MyUser:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - phone_number
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        emailAddress:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          minLength: 12
+          maxLength: 15
+          pattern: '^\+[0-9]{1,14}$'
+      example:
+        - firstName: Dale
+        - lastName: Jacques
+        - emailAddress: dale@nestably.com
+        - phoneNumber: '+12623530904'
+    MyPro:
+      type: object
+      required:
+        - companyName
+        - streetAddress
+        - cityAddress
+        - stateAddress
+        - zipcodeAddress
+        - serviceRadius
+        - displayEmail
+        - displayPhone
+        - hourlyRateCents
+        - minimumServiceChargeCents
+        - contractorFlag
+        - supplierFlag
+      properties:
+        companyName:
+          type: string
+        streetAddress:
+          type: string
+        unitNumber:
+          type: string
+        cityAddress:
+          type: string
+        stateAddress:
+          type: string
+          minLength: 2
+          maxLength: 2
+        zipcodeAddress:
+          type: string
+        serviceRadius:
+          type: integer
+          minimum: 1
+          exclusiveMinimum: false
+        displayEmail:
+          type: boolean
+          default: true
+        displayPhone:
+          type: boolean
+          default: true
+        hourlyRateCents:
+          type: integer
+          default: 0
+          minimum: 0
+          exclusiveMinimum: false
+        minimumServiceChargeCents:
+          type: integer
+          default: 0
+          minimum: 0
+          exclusiveMinimum: false
+        contractorFlag:
+          type: boolean
+          default: true
+        supplierFlag:
+          type: boolean
+          default: false
+      example:
+        - companyName: Nestably
+        - streetAddress: 123 MyAddress Drive
+        - cityAddress: Chicago
+        - stateAddress: IL
+        - zipcodeAddress: '60615'
+        - serviceRadius: 100
+        - displayEmail: true
+        - displayPhone: true
+        - hourlyRateCents: 10000
+        - minimumServiceChargeCents: 30000
+        - contractorFlag: true
+        - supplierFlag: true
+    ProProfile:
+      type: object
+      required:
+        - firstName
+        - lastName
+        - sub
+        - emailAddress
+        - phoneNumber
+        - profilePictureS3
+        - contractorId
+        - companyName
+        - website
+        - cityAddress
+        - stateAddress
+        - proSlug
+        - aboutMe
+        - verifiedContractor
+        - hourlyRateCents
+        - minimumServiceChargeCents
+        - tradesString
+        - portfolioPicturesString
+        - languagesString
+        - proValueRating
+        - proQualityRating
+        - proTimeRating
+        - recommendedRating
+        - ratingCount
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        sub:
+          type: string
+        emailAddress:
+          type: string
+          format: email
+          nullable: true
+        phoneNumber:
+          type: string
+          minLength: 12
+          maxLength: 15
+          pattern: '^\+[0-9]{1,14}$'
+          nullable: true
+        profilePictureS3:
+          type: string
+          format: uri
+        contractorId:
+          type: integer
+        companyName:
+          type: string
+        website:
+          type: string
+          format: uri
+          nullable: true
+        cityAddress:
+          type: string
+        stateAddress:
+          type: string
+        proSlug:
+          type: string
+        aboutMe:
+          type: string
+          nullable: true
+        verifiedContractor:
+          type: boolean
+        hourlyRateCents:
+          type: integer
+          default: 0
+          minimum: 0
+          exclusiveMinimum: false
+        minimumServiceChargeCents:
+          type: integer
+          default: 0
+          minimum: 0
+        tradesString:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 1
+                exclusiveMinimum: false
+              name:
+                type: string
+        portfolioPicturesString:
+          type: array
+          maxLength: 6
+          items:
+            type: string
+            format: uri
+        languagesString:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                minimum: 1
+                exclusiveMinimum: false
+              name:
+                type: string
+        proValueRating:
+          type: number
+          minimum: 0
+          maximum: 5
+          exclusiveMinimum: false
+          exclusiveMaximum: false
+          maxLength: 3
+        proQualityRating:
+          type: number
+          minimum: 0
+          maximum: 5
+          exclusiveMinimum: false
+          exclusiveMaximum: false
+          maxLength: 3
+        proTimeRating:
+          type: number
+          minimum: 0
+          maximum: 5
+          exclusiveMinimum: false
+          exclusiveMaximum: false
+          maxLength: 3
+        recommendedRating:
+          type: number
+          minimum: 0
+          maximum: 1
+          exclusiveMinimum: false
+          exclusiveMaximum: true
+        ratingCount:
+          type: integer
+          minimum: 0
+          exclusiveMinimum: false
+      example:
+        - firstName: Dale
+        - lastName: Jacques
+        - sub: qqqqqqqq-1111-2222-3333-rrrrrrrrrrrr
+        - emailAddress: dale@nestably.com
+        - phoneNumber: '+12623530904'
+        - profilePictureS3: 'https://test-portfolio-project.s3.us-east-2.amazonaws.com/user_001/portfolio_pictures/logo+reverse.png'
+        - contractorId: 1
+        - companyName: Senco Construction
+        - website: senco.biz
+        - cityAddress: Chicago
+        - stateAddress: IL
+        - proSlug: senco-construction
+        - aboutMe: null
+        - verifiedContractor: true
+        - hourlyRateCents: 10000
+        - minimumServiceChargeCents: 30000
+        - tradesString: '[{''id'': 1, ''name'': ''electrical''}, {''id'': 12, ''name'': ''plumbing''}]'
+        - portfolioPicturesString: '[''https://test-portfolio-project.s3.us-east-2.amazonaws.com/user_001/portfolio_pictures/logo+reverse.png'', ''https://test-portfolio-project.s3.us-east-2.amazonaws.com/user_001/portfolio_pictures/logo+reverse.png'']'
+        - languagesString: '[{''id'': 1, ''name'': ''English''}]'
+        - proValueRating: 5
+        - proQualityRating: 4.9
+        - proTimeRating: 4
+        - recommendedRating: 0.9
+        - ratingCount: 10
+    Trades:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            minimum: 1
+            exclusiveMinimum: false
+          name:
+            type: string
+          selected:
+            type: boolean
+            default: false
+      example:
+        - id: 1
+          name: carpentry
+          selected: false
+        - id: 2
+          name: electrical
+          selected: false
+        - id: 3
+          name: plumbing
+          selected: false
+    Languages:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            minimum: 1
+            exclusiveMinimum: false
+          name:
+            type: string
+          selected:
+            type: boolean
+            default: false
+      example:
+        - id: 1
+          name: English
+          selected: false
+        - id: 2
+          name: Spanish
+          selected: false
+        - id: 3
+          name: Russian
+          selected: false
+    LikePro:
+      type: object
+      required:
+        - liked
+      properties:
+        liked:
+          type: boolean
+      example:
+        - liked: true
+    ReviewPro:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - value_rating
+        - time_rating
+        - quality_rating
+        - recommended_rating
+        - free_text_review
+        - verified_review
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        value_rating:
+          type: integer
+          minimum: 1
+          exclusiveMinimum: false
+          maximum: 5
+          exclusiveMaximum: false
+        time_rating:
+          type: integer
+          minimum: 1
+          exclusiveMinimum: false
+          maximum: 5
+          exclusiveMaximum: false
+        quality_rating:
+          type: integer
+          minimum: 1
+          exclusiveMinimum: false
+          maximum: 5
+          exclusiveMaximum: false
+        recommended_rating:
+          type: boolean
+        free_text_review:
+          type: string
+        verified_review:
+          type: boolean
+        created_date:
+          type: string
+          format: date
+        modified_date:
+          type: string
+          format: date
+      example:
+        - first_name: Dale
+        - last_name: Jacques
+        - value_rating: 4
+        - time_rating: 1
+        - quality_rating: 5
+        - recommended_rating: true
+        - free_text_review: Rusty was great!
+        - verified_review: true
+  responses:
+    404NotFound:
+      description: The specified resource was not found.
+    502InternalServerError:
+      description: Error in the backend resource
+  securitySchemes: {}
